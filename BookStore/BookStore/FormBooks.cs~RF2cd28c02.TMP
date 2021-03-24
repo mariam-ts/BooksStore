@@ -1,0 +1,77 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace BookStore
+{
+    public partial class FormBooks : Form
+    {
+        DataTable DT;
+        Boolean Elabled = true;
+        public FormBooks()
+        {
+            InitializeComponent();
+        }
+
+        private void FormBooks_Load(object sender, EventArgs e)
+        {
+            this.CenterToScreen();
+            services service = new services();
+            DT = service.getTable("Books");
+            foreach(DataRow row in DT.Rows)
+            {
+                Options.Items.Add(row["Title"].ToString());
+            }
+        }
+
+        private void Back_Click(object sender, EventArgs e)
+        {
+            Menu m = new Menu();
+            this.Hide();
+            m.Show();
+        }
+
+        private void Options_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string SelectedTitle = Options.SelectedItem.ToString();
+            foreach (DataRow row in DT.Rows)
+            {
+                if(row["Title"].ToString() == SelectedTitle)
+                {
+                    Title.Text = row["Title"].ToString();
+                    Author.Text = row["Author"].ToString();
+                    ISBN.Text = row["ISBN"].ToString();
+                    Price.Text = row["Price"].ToString();
+                }
+                
+            }
+        }
+
+        private void NewBook_Click(object sender, EventArgs e)
+        {
+            this.Enabled = false;
+            Options.Enabled = this.Enabled;
+        }
+
+        private void Save_Click(object sender, EventArgs e)
+        {
+            string[] data = new string[4];
+            data[0] = Title.Text;
+            data[1] = Author.Text;
+            data[2] = ISBN.Text;
+            data[3] = Price.Text;
+
+            if (this.Elabled)
+            {
+                services s = new services();
+                s.updateBooks(data, data[0]);
+            }
+        }
+    }
+}

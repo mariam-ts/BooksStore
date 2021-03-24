@@ -1,0 +1,3 @@
+Sopo,Shankulashvili,Tbilisi,pekini,saburtalo,12365,+995586212458,sophio@gmail.com,
+Tato,Tabagari,Tbilisi,gadakarguli,sofeli,01236,+995478962145,tatulina@gmail.com,
+Tamar,Tsirekidze,Tbilisi,VazhaPshavela,saburtalo,08966,+995557577811,mariam@gmail.com,

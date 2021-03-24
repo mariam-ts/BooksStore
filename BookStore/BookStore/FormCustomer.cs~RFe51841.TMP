@@ -1,0 +1,143 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.IO;
+
+namespace BookStore
+{
+    public partial class FormCustomer : Form
+    {
+        public FormCustomer()
+        {
+            InitializeComponent();
+        }
+        private void WriteOrder(string filename)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(filename, FileMode.Append, FileAccess.Write))
+                {
+                    string text = "";
+
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.WriteLine($"------------------------NEW CUSTOMER------------------------------------------");
+                        sw.Write("----------First Name: ");
+                        sw.WriteLine(FirstName.Text);
+                        sw.Write("----------Last Name: ");
+                        sw.WriteLine(LastName.Text);
+                        sw.Write("----------City");
+                        sw.WriteLine(City.Text);
+                        sw.Write("----------Address: ");
+                        sw.WriteLine(Address.Text);
+                        sw.Write("----------State: ");
+                        sw.WriteLine(State.Text);
+                        sw.Write("----------Zip code: ");
+                        sw.WriteLine(Zip.Text);
+                        sw.Write("----------Phone");
+                        sw.WriteLine(Phone.Text);
+                        sw.Write("----------Email");
+                        sw.WriteLine(Email.Text);
+
+                        sw.WriteLine("_____________________________________________________________________________");
+                        
+                        sw.WriteLine("");
+                        sw.WriteLine("");
+
+                    }
+                }
+            }
+            catch (FileNotFoundException F)
+            {
+                Console.WriteLine(F.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Options.Items.Add("Edit an Existing Customer");
+            Options.Items.Add("Add a New Customer");
+        }
+
+        private void FirstName_TextChanged(object sender, EventArgs e)
+        {
+   
+        }
+
+        private void Save_Click(object sender, EventArgs e)
+        {
+            if(!Regex.IsMatch(FirstName.Text, "[a-zA-Z]{1,}"))
+            {
+                MessageBox.Show("Please enter proper First Name", "Warning");
+                FirstName.Focus();
+            }
+            else if (!Regex.IsMatch(LastName.Text, "[a-zA-Z]{1,}"))
+            {
+                MessageBox.Show("Please enter proper Last Name", "Warning");
+                LastName.Focus();
+            }
+            else if (!Regex.IsMatch(City.Text, @"^([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)$"))
+            {
+                MessageBox.Show("Please enter proper City", "Warning");
+                City.Focus();
+            }
+            else if (!Regex.IsMatch(Address.Text, @"^([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)$"))
+            {
+                MessageBox.Show("Please enter proper Address", "Warning");
+                Address.Focus();
+            }
+            else if (!Regex.IsMatch(State.Text, @"^([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)$"))
+            {
+                MessageBox.Show("Please enter proper State", "Warning");
+                State.Focus();
+            }
+            else if (!Regex.IsMatch(Zip.Text, @"^\d{5}(?:[-\s]\d{4})?$"))
+            {
+                MessageBox.Show("Please enter proper Zip code", "Warning");
+                Zip.Focus();
+            }
+            else if (!Regex.IsMatch(Phone.Text, "[+(995)0-9]{10}"))
+            {
+                MessageBox.Show("Please enter proper Phone Number (pattern : +995 *** ***)", "Warning");
+                Phone.Focus();
+            }
+            else if (!Regex.IsMatch(Email.Text, "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"))
+            {
+                MessageBox.Show("Please enter proper Email Address", "Warning");
+                Email.Focus();
+            }
+            else{
+                string Path = "Customers.txt"; 
+                WriteOrder(Path);
+            }
+        }
+    }
+}

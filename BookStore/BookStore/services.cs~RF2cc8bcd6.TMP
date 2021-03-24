@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.SqlClient;
+using System.Data;
+
+namespace BookStore
+{
+    class services
+    {
+        SqlConnection connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\tsire\Desktop\BookStore\BookStore\DB.mdf;Integrated Security=True");
+        SqlCommand sc;
+        SqlDataAdapter DtAdapter;
+
+        public DataTable getTable(string tableName)
+        {
+            connection.Open();
+            DataTable DT = new DataTable();
+            DtAdapter = new SqlDataAdapter($"select * from {tableName}", this.connection);
+            DtAdapter.Fill(DT);
+            connection.Close();
+            return DT;
+        }
+
+        public void insertBooks(string tableName, String[] row)
+        {
+            connection.Open();
+            SqlCommand command = new SqlCommand($"INSERT INTO Books(Title, Author, ISBN, Price) Values({row[0]},{row[1]},{row[2]},{row[3]}) ", this.connection);
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+
+        public void updateBooks(string tableName, String[] row, string Title)
+        {
+            connection.Open();
+            SqlCommand command = new SqlCommand($"UPDATE {tableName} SET  Title= {row[0]}, Author = {row[1]}, ISBN = {row[2]}, Price = {row[3]} WHERE Title = {Title}; ");
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+}

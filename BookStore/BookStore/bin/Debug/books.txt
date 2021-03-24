@@ -1,0 +1,3 @@
+Joe Nobody,102030,105.99,Java For Dummies,
+Mary Nobody,203010,160.25,C# for Advanced Programmers,
+Anne Nobody, 805060,77.88,Learn Coding(C++),

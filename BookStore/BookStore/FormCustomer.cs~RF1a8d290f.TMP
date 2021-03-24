@@ -1,0 +1,281 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Data.SqlClient;
+
+namespace BookStore
+{
+    public partial class FormCustomer : Form
+    {
+        List<Customers> Customers = new List<Customers>();
+        Boolean edit = false;
+        int index;
+
+        SqlConnection connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=DB.mdf;Integrated Security=True");
+        SqlCommand sc;
+        public FormCustomer()
+        {
+            InitializeComponent();
+            this.CenterToScreen();
+            
+        }
+        private void WriteCustomer(string filename)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(filename, FileMode.Append, FileAccess.Write))
+                {
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.Write($"{FirstName.Text},");
+                        sw.Write($"{LastName.Text},");
+                        sw.Write($"{City.Text},");
+                        sw.Write($"{Address.Text},");
+                        sw.Write($"{State.Text},");
+                        sw.Write($"{Zip.Text},");
+                        sw.Write($"{Phone.Text},");
+                        sw.WriteLine($"{Email.Text},");
+
+                    }
+                }
+            }
+            catch (FileNotFoundException F)
+            {
+                Console.WriteLine(F.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+
+        }
+        private void DeleteLine(string filename, int index)
+        {
+            try
+            {
+                string[] Lines = File.ReadAllLines(filename);
+                File.Delete(filename);// Deleting the file
+                using (StreamWriter sw = File.AppendText(filename))
+
+                {
+                    int i = 0;
+                    foreach (string line in Lines)
+                    {
+                        if (i==index)
+                        {
+                            //Skip the line
+                            ++i;
+                            continue;
+                        }
+                        else
+                        {
+                            sw.WriteLine(line);
+                        }
+                        ++i;
+                    }
+                }
+                edit = false;
+            }
+            catch (FileNotFoundException F)
+            {
+                Console.WriteLine(F.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+
+        }
+        private void Read(string filename)
+        {
+            char Delimiter = ',';
+            try
+            {
+                using (FileStream inFile = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                {
+                    using (StreamReader reader = new StreamReader(inFile))
+                    {
+                        Options.Items.Clear();
+                        this.Customers.Clear();
+                        string line;
+                        string[] lines;
+                        line = reader.ReadLine();
+                        while (line != null)
+                        {
+                            lines = line.Split(Delimiter);
+                            Customers currentBook = new Customers(lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
+                            this.Customers.Add(currentBook);
+                            line = reader.ReadLine();
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            index = Options.SelectedIndex;
+            FirstName.Text = Customers[index].FirstName;
+            LastName.Text = Customers[index].LastName;
+            City.Text = Customers[index].City;
+            Address.Text = Customers[index].Address;
+            Zip.Text = Customers[index].Zip;
+            Phone.Text = Customers[index].Phone;
+            State.Text = Customers[index].State;
+            Email.Text = Customers[index].Email;
+            edit = true;
+        }
+
+        private void FirstName_TextChanged(object sender, EventArgs e)
+        {
+   
+        }
+
+        private void Save_Click(object sender, EventArgs e)
+        {
+            Options.Enabled = true;
+            if (!Regex.IsMatch(FirstName.Text, "[a-zA-Z]{1,}"))
+            {
+                MessageBox.Show("Please enter proper First Name", "Warning");
+                FirstName.Focus();
+            }
+            else if (!Regex.IsMatch(LastName.Text, "[a-zA-Z]{1,}"))
+            {
+                MessageBox.Show("Please enter proper Last Name", "Warning");
+                LastName.Focus();
+            }
+            else if (!Regex.IsMatch(City.Text, @"^([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)$"))
+            {
+                MessageBox.Show("Please enter proper City", "Warning");
+                City.Focus();
+            }
+            else if (!Regex.IsMatch(Address.Text, @"^([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)$"))
+            {
+                MessageBox.Show("Please enter proper Address", "Warning");
+                Address.Focus();
+            }
+            else if (!Regex.IsMatch(State.Text, @"^([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)$"))
+            {
+                MessageBox.Show("Please enter proper State", "Warning");
+                State.Focus();
+            }
+            else if (!Regex.IsMatch(Zip.Text, @"^\d{5}(?:[-\s]\d{4})?$"))
+            {
+                MessageBox.Show("Please enter proper Zip code", "Warning");
+                Zip.Focus();
+            }
+            else if (!Regex.IsMatch(Phone.Text, "[+(995)0-9]{10}"))
+            {
+                MessageBox.Show("Please enter proper Phone Number (pattern : +995 *** ***)", "Warning");
+                Phone.Focus();
+            }
+            else if (!Regex.IsMatch(Email.Text, "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"))
+            {
+                MessageBox.Show("Please enter proper Email Address", "Warning");
+                Email.Focus();
+            }
+            else{
+                string Path = "Customers.txt";
+                if (edit)
+                {
+                    DeleteLine(Path, index);
+                    WriteCustomer(Path);
+                    WriteInComboBox();
+                    MessageBox.Show("Your personal data is edited!", "Success");
+                }
+                else
+                {
+                    WriteCustomer(Path);
+                    WriteInComboBox();
+                    MessageBox.Show("Your personal data is saved!", "Success");
+                }
+                
+
+            }
+        }
+
+        private void WriteInComboBox()
+        {
+            string Path = "Customers.txt";
+            Read(Path);
+
+            foreach(var item in Customers)
+            {
+                Options.Items.Add($"{item.FirstName} {item.LastName}");
+            }
+        }
+
+        private void Back_Click(object sender, EventArgs e)
+        {
+            Menu m = new Menu();
+            this.Hide();
+            m.Show();
+        }
+
+        private void FormCustomer_Load(object sender, EventArgs e)
+        {
+            WriteInComboBox();
+        }
+
+        private void NewCustomer_Click(object sender, EventArgs e)
+        {
+            FirstName.Text = null;
+            LastName.Text = null;
+            City.Text = null;
+            Address.Text = null;
+            Zip.Text = null;
+            Phone.Text = null;
+            State.Text = null;
+            Email.Text = null;
+            Options.Enabled = true;
+            edit = false;
+            Options.Enabled = false;
+            FirstName.Focus();
+
+        }
+
+        private void Cancel_Click(object sender, EventArgs e)
+        {
+            FirstName.Text = null;
+            LastName.Text = null;
+            City.Text = null;
+            Address.Text = null;
+            Zip.Text = null;
+            Phone.Text = null;
+            State.Text = null;
+            Email.Text = null;
+            Options.Enabled = true;
+            edit = false;
+        }
+    }
+}
